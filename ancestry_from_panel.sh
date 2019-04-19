@@ -1,7 +1,7 @@
-# This file must contain a list of your bam files (full paths)
-bamlist=$1
 # List of polymorphisms from 1000 genomes (from correct build)
-BED="reference/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5b.20130502.sites.bed"
+BED=$1
+# This file must contain a list of your bam files (full paths)
+bamlist=$2
 # Reference genome (from correct build)
 REF="/seq/references/Homo_sapiens_assembly19/v1/Homo_sapiens_assembly19.fasta"
 # Output prefix
