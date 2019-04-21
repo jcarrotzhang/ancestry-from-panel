@@ -1,15 +1,13 @@
-# List of polymorphisms from 1000 genomes (from correct build)
+# List of polymorphisms from 1000 genomes
 BED=$1
-# This file must contain a list of your bam files (full paths)
+# List of your bam files with full paths
 bamlist=$2
-# Reference genome (from correct build)
+# Reference genome (change it to your own path)
 REF="/seq/references/Homo_sapiens_assembly19/v1/Homo_sapiens_assembly19.fasta"
 # Output prefix
 OUT=$2
 
-
 # 1. Generate low-pass pileup files
-# Call this once for each bam file
 cat $bamlist | while read bam; do
          echo "samtools mpileup -q 20 -Q 20 -l $BED -f $REF $bam > $bam.pileup"
     done
