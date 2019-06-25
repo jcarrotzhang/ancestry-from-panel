@@ -13,7 +13,7 @@ snp_location = str(sys.argv[5])+".snp_locations"
 maps = str(sys.argv[5])+".map"
 classes = str(sys.argv[6])
 chrom = str(sys.argv[7])
-pop=open("/cga/meyerson/Data/LatinAmerican_EGFR/ANALYSIS/1000GP_Phase3.sample")
+pop=open("1000GP_Phase3.sample")
 eur_s=[]
 eas_s=[]
 afr_s=[]
@@ -33,8 +33,7 @@ n_eas=["1"]*(len(eas_samples)*2)
 n_eur=["2"]*(len(eur_samples)*2)
 n_afr=["3"]*(len(afr_samples)*2)
 
-#snp=open("/cga/meyerson/home/zhangj/Latin_OncoPanel/egfr_kras_mutant/alf_dif_snp.txt")
-snp=open("/cga/meyerson/Data/LatinAmerican_EGFR/scripts/random_SNPs.txt")
+snp=open("random_SNPs.txt")
 rids=[]
 rr={}
 for line in (raw.strip().split('\t') for raw in snp):
@@ -42,9 +41,6 @@ for line in (raw.strip().split('\t') for raw in snp):
                 rids.append(str(line[1]))
                 rr[str(line[1])]=line[2]
 
-print "my poor Louis"
-print len(eas_samples), len(eur_samples), len(afr_samples)
-#print len(eas_samples), len(eur_samples)
 location=open(loc)
 ll={}
 for line in (raw.strip().split(' ') for raw in location):
@@ -76,10 +72,9 @@ for line in (raw.strip().split('\t') for raw in input2):
                 n_case=["0"] * ((len(line)-9) * 2)
 
 
-print "my poor Louis"
 OUT=open(classes, 'w')
 out=" ".join(n_case)+" "+" ".join(n_eas)+" "+" ".join(n_eur)+" "+" ".join(n_afr)
-#out=" ".join(n_case)+" "+" ".join(n_eas)+" "+" ".join(n_eur)
+
 print >>OUT, out
 input1=gzip.open(ref)
 pp_eur={}
