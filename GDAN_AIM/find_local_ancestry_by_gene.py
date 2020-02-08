@@ -25,7 +25,7 @@ pos1, pos2 = pos.split("-")
 
 gl=[]
 
-input2=open("TCGA_geno/gdan_aim_patient_ancestry_calls_v2.txt")
+input2=open("TCGA_geno/gdan_aim_patient_ancestry_calls.txt")
 input3=open("/xchip/gcc_data/results2/aggregate/sif/production.postprocess.sif.txt")
 
 eur_pop={}
