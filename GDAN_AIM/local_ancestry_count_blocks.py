@@ -39,7 +39,6 @@ for line in (raw.strip().split() for raw in input2):
                                                (sampleID, tumor_type, consensus_call) = line[0:3]
                                                eur_pop["TCGA-"+str(sampleID)]=line[len(line)-5]
                                                afr_pop["TCGA-"+str(sampleID)]=line[len(line)-4]
-print len(eur_pop)
 
 bks=[]
 OUTPUT=open("TCGA_geno/analysis/admixture_blocks.txt", 'w')
