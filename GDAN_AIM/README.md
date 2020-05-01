@@ -1,5 +1,4 @@
-# ancestry-from-panel
-Local ancestry analyses used in TCGA ancestry paper. 
+# Local ancestry analyses used in the TCGA ancestry paper. 
 
 ## Usage example
 
