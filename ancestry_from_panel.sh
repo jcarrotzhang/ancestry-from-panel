@@ -9,12 +9,12 @@ OUT=$2
 
 # 1. Generate low-pass pileup files
 cat $bamlist | while read bam; do
-         echo "samtools mpileup -q 20 -Q 20 -l $BED -f $REF $bam > $bam.pileup"
+         samtools mpileup -q 20 -Q 20 -l $BED -f $REF $bam > $bam.pileup
     done
 
 # 2. Convert pileup to Laser input (.seq file)
 cat $bamlist | while read bam; do
-        echo "python ~bin/LASER-2.04/pileup2seq/pileup2seq.py -f $REF -m reference/HGDP.extract.site -o $bam $bam.pileup"
+       python ~bin/LASER-2.04/pileup2seq/pileup2seq.py -f $REF -m reference/HGDP.extract.site -o $bam $bam.pileup
     done
 
 # 3. prepare for LASER
@@ -26,4 +26,4 @@ head -n 1 $bamlist | while read bam; do
 #4. run LASER for both reference and cases
 # Note:
 # -- change SEQ_FILE to $OUT.seq
-~bin/LASER-2.04/laser -p Laser.example.conf -k 10
+~bin/LASER-2.04/laser -p reference/Laser.example.conf -k 10
