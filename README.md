@@ -4,7 +4,7 @@ Ancestry identification from panel sequencing data using off-target reads
 * Samtools
 * LASER
 * BEAGLE
-* RFMIX
+* RFMIX (https://github.com/slowkoni/rfmix)
 
 ## Usage 
 
@@ -21,3 +21,7 @@ sh ancestry_from_panel.sh SNP_sites.bed Bamfiles_list.txt output_prefix
 ```
 sh offtarget_local_ancestry.sh Bamfiles_list.txt output_prefix
 ```
+
+** ** BEAGLE reference vcf : http://bochet.gcc.biostat.washington.edu/beagle/genetic_maps/
+** ** BEAGLE reference map : http://bochet.gcc.biostat.washington.edu/beagle/1000_Genomes_phase3_v5a/
+
