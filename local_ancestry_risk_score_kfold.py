@@ -15,11 +15,11 @@ from sklearn.model_selection import train_test_split
 from sklearn.model_selection import LeavePOut
 from functools import reduce
 
-k=10
+k=sys.argv[1]
 kf = KFold(n_splits=k)
 
 ###########################################################################
-samplist=open("ANALYSIS/admixture/rfmix_results.txt")
+samplist=open("ANALYSIS/admixture/rfmix_results.txt")  ## list of rfmix results by chromosome. ##
 
 first = samplist.readline().strip()
 b=pd.read_csv(str(first), skiprows=1, sep="\t")
@@ -28,7 +28,7 @@ b=b.T
 b.columns = b.iloc[-1]
 
 i=1
-with open("ANALYSIS/admixture/rfmix2_positive.txt") as samplist:
+with open("ANALYSIS/admixture/rfmix_results.txt") as samplist:
        next(samplist)
        for line in (raw.strip().split('\t') for raw in samplist):
                i=i+1
@@ -42,11 +42,10 @@ b = b.iloc[:-1]
 
 ###########################################################################
 b['set'] = b.index
-r00=pd.read_csv("ANALYSIS/MS/final_a-g/ancestry_vs_mutation.txt", sep="\t")
+r00=pd.read_csv("ANALYSIS/ancestry_vs_mutation.txt", sep="\t") ## read in somatic mutation information. ##
 data_frames=[b, r00]
 rr = reduce(lambda  left,right: pd.merge(left,right,on=['#sample'], how='outer'), data_frames)
 rr.to_csv("ANALYSIS/merged.txt", sep="\t")
-rr=pd.read_csv("ANALYSIS/merged.txt", sep="\t")
 P={}
 C={}
 Z={}
