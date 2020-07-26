@@ -3,6 +3,9 @@ Ancestry identification from panel sequencing data using off-target reads
 ## Requirements
 * Samtools
 * LASER
+* BEAGLE
+* RFMIX
+
 ## Usage 
 
 #### Run LASER for ancestry identification. 
