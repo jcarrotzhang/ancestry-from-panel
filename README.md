@@ -28,8 +28,7 @@ sh offtarget_local_ancestry.sh Bamfiles_list.txt output_prefix
 * BEAGLE reference map : http://bochet.gcc.biostat.washington.edu/beagle/1000_Genomes_phase3_v5a/ 
 
 #### Run local ancestry risk score.
-This is a simple python script that is an example of how I calculated the cross-validated local ancstry risk score. 
+This is a simple python script that is an example of how I calculated the cross-validated local ancstry risk score. (k=10 for ten-fold cross-validation)
 ```
 python admixture_kfold.py k
 ```
-(k=10 for ten-fold cross-validation)
