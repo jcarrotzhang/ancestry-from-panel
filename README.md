@@ -18,10 +18,18 @@ sh ancestry_from_panel.sh SNP_sites.bed Bamfiles_list.txt output_prefix
 
 
 #### Run local ancestry identification.
+Please prepare a BED file of selected SNPs to assign ancestry for.
+
 ```
 sh offtarget_local_ancestry.sh Bamfiles_list.txt output_prefix
 ```
 
-BEAGLE reference vcf : http://bochet.gcc.biostat.washington.edu/beagle/genetic_maps/ 
-BEAGLE reference map : http://bochet.gcc.biostat.washington.edu/beagle/1000_Genomes_phase3_v5a/ 
-Please prepare a BED file of selected SNPs to assign ancestry.
+* BEAGLE reference vcf : http://bochet.gcc.biostat.washington.edu/beagle/genetic_maps/ 
+* BEAGLE reference map : http://bochet.gcc.biostat.washington.edu/beagle/1000_Genomes_phase3_v5a/ 
+
+#### Run local ancestry risk score.
+This is a simple python script that is an example of how I calculated the cross-validated local ancstry risk score. 
+```
+python admixture_kfold.py k
+```
+(k=10 for ten-fold cross-validation)
