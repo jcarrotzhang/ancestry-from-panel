@@ -2,120 +2,161 @@
 from __future__ import division
 import sys, getopt
 import re
+import numpy as np
+from scipy import stats
 import argparse, os, sys
-import gzip
+import patsy
+import math
+import pandas as pd
+import statsmodels.api as sm
+import sklearn
+from sklearn.model_selection import KFold # import KFold
+from sklearn.model_selection import train_test_split
+from sklearn.model_selection import LeavePOut
+from functools import reduce
 
-case = str(sys.argv[1])
-ref = str(sys.argv[2])
-loc = str(sys.argv[3])
-alleles = str(sys.argv[4])
-snp_location = str(sys.argv[5])+".snp_locations"
-maps = str(sys.argv[5])+".map"
-classes = str(sys.argv[6])
-chrom = str(sys.argv[7])
-pop=open("1000GP_Phase3.sample")
-eur_s=[]
-eas_s=[]
-afr_s=[]
+k=10
+kf = KFold(n_splits=k)
 
-for line in (raw.strip().split(' ') for raw in pop):
-        if ("EUR" in line[2]) and ("FIN" not in line[1]):
-                eur_s.append(line[0])
-        if ("EAS" in line[2]):
-                eas_s.append(line[0])
-        if ("AFR" in line[2]):
-                afr_s.append(line[0])
+###########################################################################
+samplist=open("ANALYSIS/admixture/rfmix_results.txt")
 
-eur_samples=eur_s[0:500]
-eas_samples=eas_s[0:500]
-afr_samples=afr_s[0:500]
-n_eas=["1"]*(len(eas_samples)*2)
-n_eur=["2"]*(len(eur_samples)*2)
-n_afr=["3"]*(len(afr_samples)*2)
+first = samplist.readline().strip()
+b=pd.read_csv(str(first), skiprows=1, sep="\t")
+b["pos"]=b["#chm"].astype(str)+":"+b["spos"].astype(str)
+b=b.T
+b.columns = b.iloc[-1]
 
-snp=open("random_SNPs.txt")
-rids=[]
-rr={}
-for line in (raw.strip().split('\t') for raw in snp):
-        if line[0] == chrom:
-                rids.append(str(line[1]))
-                rr[str(line[1])]=line[2]
+i=1
+with open("ANALYSIS/admixture/rfmix2_positive.txt") as samplist:
+       next(samplist)
+       for line in (raw.strip().split('\t') for raw in samplist):
+               i=i+1
+               a=pd.read_csv(line[0], skiprows=1, sep="\t")            
+               a["pos"]=a["#chm"].astype(str)+":"+a["spos"].astype(str)
+               a=a.T
+               a.columns = a.iloc[-1]
+               b=b.join(a)
 
-location=open(loc)
-ll={}
-for line in (raw.strip().split(' ') for raw in location):
-        if str(line[0]) in rids:
-                ll[str(line[0])]=str(line[2])
+b = b.iloc[:-1]
 
-pp={}
-input2=open(case)
-n = 0
-for line in (raw.strip().split('\t') for raw in input2):
-        if "#" not in line[0]:
-                rrid = str(line[1])
-                if rrid in ll:
-                        if n == 2:
-                                n = 0
-                                phasing=line[9:len(line)]
-                                for i in range(0, len(phasing)):
-                                        l = phasing[i].split(":")[0]
-                                        p="".join(l.split("|"))
-                                        if ("10" in p) or ("01" in p) or ("00" in p) or ("11" in p): ### exclude biallelic SNPs. ###
-                                                if rrid in pp:
-                                                        pp[rrid] = pp[rrid]+""+str(p)
-                                                else:
-                                                        pp[rrid] = str(p)
-                        else:
-                                n = n + 1
+###########################################################################
+b['set'] = b.index
+r00=pd.read_csv("ANALYSIS/MS/final_a-g/ancestry_vs_mutation.txt", sep="\t")
+data_frames=[b, r00]
+rr = reduce(lambda  left,right: pd.merge(left,right,on=['#sample'], how='outer'), data_frames)
+rr.to_csv("ANALYSIS/merged.txt", sep="\t")
+rr=pd.read_csv("ANALYSIS/merged.txt", sep="\t")
+P={}
+C={}
+Z={}
+O1={}
+O2={}
 
-        if "#CHROM" in line[0]:
-                n_case=["0"] * ((len(line)-9) * 2)
+for l in range(1, k+1):
+        O1[l]=open("/cga/meyerson/Data/LatinAmerican_EGFR/ANALYSIS/MS/final/admixture_stats_k"+str(l)+".txt", 'w')
+        O2[l]=open("/cga/meyerson/Data/LatinAmerican_EGFR/ANALYSIS/MS/final/final_admixture_results_k"+str(l)+".txt", 'w')
+l=0
 
+markers=rr.columns
+i = markers[1]
+print i
+r=rr[[i, "set", "#sample", "EGFR", "AMR_mean", "cohort"]]
+r[i] = r[i].replace({2: 0})
+aggregation_functions = {i: 'sum', "EGFR": 'first', "AMR_mean": 'first', "cohort": 'first'}
+r = r.groupby(r['#sample']).aggregate(aggregation_functions)
+r=r[[i, "EGFR", "AMR_mean", "cohort"]]
+r=r.T
+for i in markers[2:-1]:
+                if ":" in i:
+                        new=rr[[i, "#sample", "EGFR", "AMR_mean", "cohort"]]
+                        new=new.dropna()
+                        new[i] = new[i].replace({2: 0})
 
-OUT=open(classes, 'w')
-out=" ".join(n_case)+" "+" ".join(n_eas)+" "+" ".join(n_eur)+" "+" ".join(n_afr)
+                        aggregation_functions = {i: 'sum', "EGFR": 'first', "AMR_mean": 'first', "cohort": 'first'}
+                        new = new.groupby(new['#sample']).aggregate(aggregation_functions)
 
-print >>OUT, out
-input1=gzip.open(ref)
-pp_eur={}
-pp_afr={}
-pp_eas={}
-for line in (raw.strip().split('\t') for raw in input1):
-        if "#CHROM" in line[0]:
-                sampleName = line[9:len(line)]
-        if ("#" not in line[0]) and ("#CHROM" not in line[0]):
-                       rid = str(line[1])
-                       if rid in pp:
-                                phasing=line[9:len(line)]
-                                for i in range(0, len(sampleName)):
-                                        l = phasing[i].split(":")[0]
-                                        p="".join(l.split("|"))
-                                        if ("10" in p) or ("01" in p) or ("00" in p) or ("11" in p): ### exclude biallelic SNPs. ###
-                                                if sampleName[i] in eas_samples:
-                                                        if rid in pp_eas:
-                                                                pp_eas[rid] = pp_eas[rid]+""+str(p)
-                                                        else:
-                                                                pp_eas[rid] = str(p)
-                                                if sampleName[i] in afr_samples:
-                                                        if rid in pp_afr:
-                                                                pp_afr[rid] = pp_afr[rid]+""+str(p)
-                                                        else:
-                                                                pp_afr[rid] = str(p)
-                                                if sampleName[i] in eur_samples:
-                                                        if rid in pp_eur:
-                                                                pp_eur[rid] = pp_eur[rid]+""+str(p)
-                                                        else:
-                                                                pp_eur[rid] = str(p)
+                        new=new[i]
+                        new=new.T
+                        r=r.append(new)
 
+r=r.T
+markers=r.columns
 
-OUT1=open(alleles, 'w')
-OUT2=open(snp_location, 'w')
-OUT3=open(maps, 'w')
-for p in sorted(pp.iterkeys(), key=int):
-        if (p in pp_eas) and  (p in pp_eur) and  (p in pp_afr):
-                out=pp[p]+""+pp_eas[p]+""+pp_eur[p]+""+pp_afr[p]
-                #out=pp[p]+""+pp_eas[p]+""+pp_eur[p]
-                out2=str(p)+" "+str(ll[p])+" "+str(rr[p])
-                print >>OUT1, out
-                print >>OUT2, ll[p]
-                print >>OUT3, out2
+##############################################################################
+############### start to use from here ################
+##############################################################################
+
+for train_index, test_index in kf.split(r["EGFR"].values):
+#train, test, y_train, y_test = train_test_split(r, r["EGFR"].values, test_size=0.4)
+        train=r.iloc[train_index]
+        test=r.iloc[test_index]
+
+        train=train.dropna()
+        test=test.dropna()
+        test["risk_sum0"]=0
+        test["risk_sum1"]=0
+        test["risk_sum2"]=0
+        test["risk_sum3"]=0
+
+        print (len(train), len(test))
+        print (len(train[train["EGFR"]==1]), len(test[test["EGFR"]==1]))
+        for i in markers[1:-1]:
+                if ":" in i:
+                        print (i)
+
+                        ############################################
+                        ## discovery ancestry associated loci ######
+                        ############################################
+                        new=train[[i, "EGFR", "AMR_mean", "cohort"]]
+                        new.columns=["marker", "EGFR", "AMR_mean", "cohort"]
+                        new["marker"] = new["marker"].astype(int)
+                        #null_columns=new.columns[new.isnull().any()]
+                        #print new[new.isnull().any(axis=1)][null_columns].head()
+                        f = "EGFR ~ marker + AMR_mean + cohort"
+                        y, X = patsy.dmatrices(f, new, return_type='dataframe')
+                        result = sm.Logit(y, X).fit()
+                        P[i] = result.pvalues[2:3].values[0]
+                        C[i] = result.params[2:3].values[0]
+                        Z[i] = result.summary2().tables[1]['z'][2:3].values[0]
+
+                        #########################################################
+                        ## calculate polygeneic risk score for the test cohort ##
+                        #########################################################
+                        if (float(P[i])<0.00005) and (float(C[i])>0):
+                                test["risk_sum0"]=test["risk_sum0"]+test[i].astype(int)*Z[i].astype(int)
+                        if (float(P[i])<0.0001) and (float(C[i])>0):
+                                test["risk_sum1"]=test["risk_sum1"]+test[i].astype(int)*Z[i].astype(int)
+
+                        if (float(P[i])<0.001) and (float(C[i])>0):
+                                test["risk_sum2"]=test["risk_sum2"]+test[i].astype(int)*Z[i].astype(int)
+
+                        if (float(P[i])<0.05) and (float(C[i])>0):
+                                test["risk_sum3"]=test["risk_sum3"]+test[i].astype(int)*Z[i].astype(int)
+
+        l=l+1
+        test[["#sample", "EGFR", "risk_sum0", "risk_sum1", "risk_sum2", "risk_sum3", "AMR_mean", "cohort"]].to_csv(O2[l], sep="\t")
+
+        f = "EGFR ~ risk_sum1 + AMR_mean + cohort"
+        y, X = patsy.dmatrices(f, test, return_type='dataframe')
+        result = sm.Logit(y, X).fit()
+        print (result.pvalues, file=O1[l])
+        print (result.summary(), file=O1[l])
+
+        f = "EGFR ~ risk_sum2 + AMR_mean + cohort"
+        y, X = patsy.dmatrices(f, test, return_type='dataframe')
+        result = sm.Logit(y, X).fit()
+        print (result.pvalues, file=O1[l])
+        print (result.summary(), file=O1[l])
+
+        f = "EGFR ~ risk_sum3 + AMR_mean + cohort"
+        y, X = patsy.dmatrices(f, test, return_type='dataframe')
+        result = sm.Logit(y, X).fit()
+        print (result.pvalues, file=O1[l])
+        print (result.summary(), file=O1[l])
+
+        f = "EGFR ~ risk_sum0 + AMR_mean + cohort"
+        y, X = patsy.dmatrices(f, test, return_type='dataframe')
+        result = sm.Logit(y, X).fit()
+        print (result.pvalues, file=O1[l])
+        print (result.summary(), file=O1[l])
