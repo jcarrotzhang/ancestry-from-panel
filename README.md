@@ -14,7 +14,7 @@ sh ancestry_from_panel.sh SNP_sites.bed Bamfiles_list.txt output_prefix
 ** ** HGDP.extract.site for LASER is provided. Please prepare the HGDP.extract.geno file with SNPs matching the .site file.
 
 
-#### Run imputation.
+#### Run local ancestry identification.
 ```
 sh scripts/offtarget_impute.sh 
 ```
