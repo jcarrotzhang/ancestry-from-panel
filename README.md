@@ -16,5 +16,5 @@ sh ancestry_from_panel.sh SNP_sites.bed Bamfiles_list.txt output_prefix
 
 #### Run local ancestry identification.
 ```
-sh scripts/offtarget_impute.sh 
+sh offtarget_local_ancestry.sh Bamfiles_list.txt output_prefix
 ```
