@@ -1,9 +1,5 @@
 ## low coverage calling local ancestry pipeline
 ## -----------------------------
-## Software to be called: samtools, bcftools, BEAGLE, BEAGLE reference data and RFMix2 (https://github.com/slowkoni/rfmix):
-## BEAGLE reference vcf : http://bochet.gcc.biostat.washington.edu/beagle/genetic_maps/
-## BEAGLE reference map : http://bochet.gcc.biostat.washington.edu/beagle/1000_Genomes_phase3_v5a/
-
 ## Input data ---
 # This file must contain a list of your bam files (full paths)
 bamlist=$1
@@ -28,18 +24,18 @@ done
 
 # 3. Imputation
 # can replace the chunklist file defining regions from 1MB-5MB across the genome. 
-cat /cga/meyerson/home/zhangj/reference/chunklist1-X.txt | while read line; do
+cat reference/chunklist.txt | while read line; do
         chr=`echo $line | awk '{ print $1 }'`
         p0=`echo $line | awk '{ print $2 }'`
         p1=`echo $line | awk '{ print $3 }'`
 
-        echo "java -Xmx10g -jar /cga/meyerson/home/zhangj/bin/beagle.08Jun17.d8b.jar \
+        java -Xmx10g -jar ~bin/beagle.08Jun17.d8b.jar \
         gt=$OUT.chr${chr}.vcf.gz \
-        ref=/cga/meyerson/home/zhangj/reference/beagle/chr${chr}.1kg.phase3.v5a.vcf.gz \
+        ref=~reference/beagle/chr${chr}.1kg.phase3.v5a.vcf.gz \
         out=$OUT.$chr.$p0.$p1.beagle_phased \
-        map=/cga/meyerson/home/zhangj/reference/beagle/plink.chr${chr}.GRCh37.map \
+        map=~reference/beagle/plink.chr${chr}.GRCh37.map \
         chrom=${chr}:${p0}-${p1} \
-        impute=true"
+        impute=true
 
 done;
 
