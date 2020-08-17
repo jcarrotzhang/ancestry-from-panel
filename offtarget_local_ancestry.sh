@@ -4,7 +4,7 @@
 # This file must contain a list of your bam files (full paths)
 bamlist=$1
 # List of polymorphisms from 1000 genomes
-BED="/cga/meyerson/home/zhangj/reference/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5b.20130502.sites.bed"
+BED="reference/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5b.20130502.sites.bed"
 # Reference genome (from correct build)
 REF="/seq/references/Homo_sapiens_assembly19/v1/Homo_sapiens_assembly19.fasta"
 # Output prefix
@@ -22,6 +22,8 @@ for chr in `seq 1 22`; do
        bcftools merge -l $OUT.vcflist -r ${chr} -Oz > $OUT.chr${chr}.vcf.gz
 done
 
+bcftools merge -l $OUT.vcflist -r X -Oz > $OUT.chrX.vcf.gz
+
 # 3. Imputation
 # can replace the chunklist file defining regions from 1MB-5MB across the genome. 
 cat reference/chunklist.txt | while read line; do
@@ -31,9 +33,9 @@ cat reference/chunklist.txt | while read line; do
 
         java -Xmx10g -jar ~bin/beagle.08Jun17.d8b.jar \
         gt=$OUT.chr${chr}.vcf.gz \
-        ref=~reference/beagle/chr${chr}.1kg.phase3.v5a.vcf.gz \
+        ref=reference/beagle/chr${chr}.1kg.phase3.v5a.vcf.gz \
         out=$OUT.$chr.$p0.$p1.beagle_phased \
-        map=~reference/beagle/plink.chr${chr}.GRCh37.map \
+        map=reference/beagle/plink.chr${chr}.GRCh37.map \
         chrom=${chr}:${p0}-${p1} \
         impute=true
 
@@ -57,4 +59,5 @@ for chr in `seq 1 22`; do
   -g ~reference/1000GP_Phase3/genetic_map_chr${chr}_combined_b37.rfmix.txt -m ref_samplelist.txt -o $OUT.chr${chr}.results --chromosome=${chr} \
 done
 
+## repeat step 4 for chrX. 
 ## ---
