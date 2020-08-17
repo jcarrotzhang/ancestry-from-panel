@@ -19,33 +19,9 @@ k=sys.argv[1]
 kf = KFold(n_splits=k)
 
 ###########################################################################
-samplist=open("ANALYSIS/admixture/rfmix_results.txt")  ## list of rfmix results by chromosome. ##
+r=pd.read_csv("final_admixture_results_merged_egfr_kras.csv", sep="\t")
+markers=r.columns
 
-first = samplist.readline().strip()
-b=pd.read_csv(str(first), skiprows=1, sep="\t")
-b["pos"]=b["#chm"].astype(str)+":"+b["spos"].astype(str)
-b=b.T
-b.columns = b.iloc[-1]
-
-i=1
-with open("ANALYSIS/admixture/rfmix_results.txt") as samplist:
-       next(samplist)
-       for line in (raw.strip().split('\t') for raw in samplist):
-               i=i+1
-               a=pd.read_csv(line[0], skiprows=1, sep="\t")            
-               a["pos"]=a["#chm"].astype(str)+":"+a["spos"].astype(str)
-               a=a.T
-               a.columns = a.iloc[-1]
-               b=b.join(a)
-
-b = b.iloc[:-1]
-
-###########################################################################
-b['set'] = b.index
-r00=pd.read_csv("ANALYSIS/ancestry_vs_mutation.txt", sep="\t") ## read in somatic mutation information. ##
-data_frames=[b, r00]
-rr = reduce(lambda  left,right: pd.merge(left,right,on=['#sample'], how='outer'), data_frames)
-rr.to_csv("ANALYSIS/merged.txt", sep="\t")
 P={}
 C={}
 Z={}
@@ -53,34 +29,10 @@ O1={}
 O2={}
 
 for l in range(1, k+1):
-        O1[l]=open("/cga/meyerson/Data/LatinAmerican_EGFR/ANALYSIS/MS/final/admixture_stats_k"+str(l)+".txt", 'w')
-        O2[l]=open("/cga/meyerson/Data/LatinAmerican_EGFR/ANALYSIS/MS/final/final_admixture_results_k"+str(l)+".txt", 'w')
+    O1[l]=open("admixture_stats_k"+str(l)+"_all.txt", 'w')
+    O2[l]=open("admixture_results_k"+str(l)+"_all.txt", 'w')
+
 l=0
-
-markers=rr.columns
-i = markers[1]
-print i
-r=rr[[i, "set", "#sample", "EGFR", "AMR_mean", "cohort"]]
-r[i] = r[i].replace({2: 0})
-aggregation_functions = {i: 'sum', "EGFR": 'first', "AMR_mean": 'first', "cohort": 'first'}
-r = r.groupby(r['#sample']).aggregate(aggregation_functions)
-r=r[[i, "EGFR", "AMR_mean", "cohort"]]
-r=r.T
-for i in markers[2:-1]:
-                if ":" in i:
-                        new=rr[[i, "#sample", "EGFR", "AMR_mean", "cohort"]]
-                        new=new.dropna()
-                        new[i] = new[i].replace({2: 0})
-
-                        aggregation_functions = {i: 'sum', "EGFR": 'first', "AMR_mean": 'first', "cohort": 'first'}
-                        new = new.groupby(new['#sample']).aggregate(aggregation_functions)
-
-                        new=new[i]
-                        new=new.T
-                        r=r.append(new)
-
-r=r.T
-markers=r.columns
 
 ##############################################################################
 ############### start to use from here ################
