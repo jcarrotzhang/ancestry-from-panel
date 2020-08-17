@@ -30,5 +30,5 @@ sh offtarget_local_ancestry.sh Bamfiles_list.txt output_prefix
 #### Run local ancestry risk score.
 This is a simple python script that is an example of how I calculated the cross-validated local ancstry risk score. (k=10 for ten-fold cross-validation)
 ```
-python admixture_kfold.py k
+python local_ancestry_risk_score_kfold.py k
 ```
