@@ -19,7 +19,7 @@ k=sys.argv[1]
 kf = KFold(n_splits=k)
 
 ###########################################################################
-r=pd.read_csv("final_admixture_results_merged_egfr_kras.csv", sep="\t")
+r=pd.read_csv("data/final_admixture_results_merged_egfr_kras.csv", sep="\t")
 markers=r.columns
 
 P={}
