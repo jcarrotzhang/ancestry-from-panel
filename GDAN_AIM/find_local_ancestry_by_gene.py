@@ -1,6 +1,6 @@
 #!/usr/bin/python -u
 from __future__ import division
-#import sys, getopt
+import sys, getopt
 import re
 import resource
 import numpy as np
