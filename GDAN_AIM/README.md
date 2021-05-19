@@ -12,14 +12,14 @@ python find_local_ancestry_by_gene.py PIK3CA 3:178864311-178959881
 
 #### Step 1:
 ```
-python find_local_ancestry_count_blocks.py samplelist.txt
+python local_ancestry_count_blocks.py samplelist.txt
 ```
 #####    Input: samplelist.txt   (prepare a list of local ancestry output file per sample in bed format.)
 ```
-TCGA-35-A46O_A.bed
-TCGA-35-A46O_B.bed
-TCGA-36-A47O_A.bed
-TCGA-36-A47O_B.bed
+TCGA-D8-A1JP_A.bed
+TCGA-D8-A1JP_B.bed
+TCGA-E2-A1L9_A.bed
+TCGA-E2-A1L9_B.bed
 ```
 #### Step 2:
 ```
