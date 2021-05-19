@@ -1,6 +1,6 @@
 #!/usr/bin/python -u
 from __future__ import division
-#import sys, getopt
+import sys, getopt
 import re
 import numpy as np
 import argparse, os, sys
@@ -13,12 +13,8 @@ from scipy.stats import mannwhitneyu
 import pandas as pd
 import patsy
 
-#cantype = str(sys.argv[1]).split(",")
-cantype=("ACC","ESCA","LGG","PCPG","THCA","BLCA","GBM","LIHC","PRAD","THYM","BRCA","HNSC","LUAD","UCEC","CESC","KICH","LUSC","SARC","UCS","CHOL","KIRC","MESO","SKCM","UVM","COAD","KIRP","OV","STAD","DLBC","LAML","PAAD","TGCT")
-
-input1=open("TCGA_geno/analysis/admixture_blocks.txt")
-input2=open("TCGA_geno/gdan_aim_patient_ancestry_calls.txt")
-input3=open("/xchip/gcc_data/results2/aggregate/sif/production.postprocess.sif.txt")
+input1 = str(sys.argv[1])
+input2=open("gdan_aim_patient_ancestry_calls.txt")
 
 positions={}
 for line in (raw.strip().split() for raw in input1):
@@ -39,28 +35,16 @@ for line in (raw.strip().split() for raw in input2):
 							eur_pop["TCGA-"+str(sampleID)]=line[len(line)-5]
 							afr_pop["TCGA-"+str(sampleID)]=line[len(line)-4]
 
-arrayids={}
-for line in (raw.strip().split() for raw in input3):
-	m = re.search('GenomeWideSNP_6_(.+?)$', line[3])
-	if m:
-		arrayid=m.group(1)
-		samplename=str(line[2])
-		arrayids[samplename]=arrayid
 
-### look for local ancestry. ####
-
+### look for local ancestry for each region stored in positions. ####
 lol={}
-for ctype in cantype:
-	samplelist=open("/cga/meyerson/home/zhangj/kgp/TCGA_geno/0205_seunghun/"+ctype+"/final/nofbk/samplelist")
-	files=[]
-	for line in (raw.strip().split() for raw in samplelist):
+files=[]
+for line in (raw.strip().split() for raw in samplelist):
 		files.append(line[0])
-	for sample in afr_pop:
-		if sample in arrayids:
-			print "working on", ctype, sample 
-			#if sample in arrayids:
-			sn=arrayids[sample]
-			inputfile4 = "/cga/meyerson/home/zhangj/kgp/TCGA_geno/0205_seunghun/"+ctype+"/final/nofbk/"+sn+"_A.bed"
+
+for sample in afr_pop:
+			print "working on", sample 
+			inputfile4 = sample+"_A.bed"
 			if inputfile4 in files:
 				input4=open(inputfile4)	
 				for line2 in (raw.strip().split() for raw in input4):
@@ -72,7 +56,7 @@ for ctype in cantype:
 								a1=0
 							if "AFR" in line2[3]:
 								a1=1
-							inputfile5 = "/cga/meyerson/home/zhangj/kgp/TCGA_geno/0205_seunghun/"+ctype+"/final/nofbk/"+sn+"_B.bed"
+							inputfile5 = sample+"_B.bed"
 							if inputfile5 in files:
 								input5=open(inputfile5)
 								for line3 in (raw.strip().split() for raw in input5):
@@ -100,6 +84,7 @@ for ctype in cantype:
 												if a1 == 1:
 													lol[key]=2
 
+### perform the enrichment test. ###													
 pos={}; score={}
 for key in lol:
 	chr1, pos1 = key.split(":")
