@@ -22,6 +22,7 @@ loc = str(sys.argv[3])
 Gene = str(sys.argv[2])
 globan=open("gdan_aim_patient_ancestry_calls.txt")
 
+cantype=("ACC","ESCA","LGG","PCPG","THCA","BLCA","GBM","LIHC","PRAD","THYM","BRCA","HNSC","LUAD","UCEC","CESC","KICH","LUSC","SARC","UCS","CHOL","KIRC","MESO","SKCM","UVM","COAD","KIRP","OV","STAD","DLBC","LAML","PAAD","TGCT")
 chrom, pos = loc.split(":")
 pos1, pos2 = pos.split("-")
 
@@ -41,8 +42,8 @@ for line in (raw.strip().split() for raw in globan):
 						eur_pop["TCGA-"+str(sampleID)]=line[len(line)-5]
 						afr_pop["TCGA-"+str(sampleID)]=line[len(line)-4]
 
+### find local ancestry breakpoints and store in bks. ###
 bks=[pos1, pos2]
-
 
 samplelist=open(inputfile)
 files=[]
@@ -72,6 +73,7 @@ for sample in eur_pop:
 							if str(line1[2]) not in bks:
 								bks.append(str(line1[2]))
 
+### find mutation status. ###								
 mutation={}
 for ctype in cantype:
 	MC3 = "MC3_"+ctype+"_sample_sig_gene_table.txt"
@@ -95,21 +97,19 @@ for ctype in cantype:
 				s = s + 1
 
 
-### look for local ancestry. ####
+### look for local ancestry for each bks. ####
 lol={}
-for ctype in cantype:
-	samplelist=open("/cga/meyerson/home/zhangj/kgp/TCGA_geno/0205_seunghun/"+ctype+"/final/nofbk/samplelist")
-	files=[]
-	for line in (raw.strip().split() for raw in samplelist):
-		files.append(line[0])
-	for sample in eur_pop:
-		if sample in arrayids:
-			#print "working on", ctype, sample 
-			sn=arrayids[sample]
-			inputfile4 = "/cga/meyerson/home/zhangj/kgp/TCGA_geno/0205_seunghun/"+ctype+"/final/nofbk/"+sn+"_A.bed"
-			if inputfile4 in files:
-				input4=open(inputfile4)	
-				for line2 in (raw.strip().split() for raw in input4):
+
+samplelist=open(inputfile)
+files=[]
+for line in (raw.strip().split() for raw in samplelist):
+	files.append(line[0])
+	
+for sample in eur_pop:
+			inputfile1 = sample+"_A.bed"
+			if inputfile1 in files:
+				input1=open(inputfile1)	
+				for line2 in (raw.strip().split() for raw in input1):
 					for key in bks:
 						if key not in lol:
 							lol[key]={}
@@ -119,10 +119,10 @@ for ctype in cantype:
 								a1=0
 							if "EUR" in line2[3]:
 								a1=1
-							inputfile5 = "/cga/meyerson/home/zhangj/kgp/TCGA_geno/0205_seunghun/"+ctype+"/final/nofbk/"+sn+"_B.bed"
-							if inputfile5 in files:
-								input5=open(inputfile5)
-								for line3 in (raw.strip().split() for raw in input5):
+							inputfile2 = sample+"_B.bed"
+							if inputfile2 in files:
+								input2=open(inputfile2)
+								for line3 in (raw.strip().split() for raw in input2):
 									if (str(line3[0]) == chrom) and (int(line3[1]) < int(pos1)) and (int(line3[2]) > int(pos1)):
 										if "AFR" in line3[3]:
 											if key in lol:
@@ -135,7 +135,8 @@ for ctype in cantype:
 												if a1 == 0:
 													lol[key][sample]=0
 												if a1 == 1:
-													lol[key][sample]=1							
+													lol[key][sample]=1	
+### perform association test. ####
 for pos in lol:
 	mu=[]
 	an=[]
