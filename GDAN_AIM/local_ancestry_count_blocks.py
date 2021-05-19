@@ -1,6 +1,6 @@
 #!/usr/bin/python -u
 from __future__ import division
-#import sys, getopt
+import sys, getopt
 import re
 import numpy as np
 import argparse, os, sys
@@ -13,8 +13,7 @@ from scipy.stats import mannwhitneyu
 import pandas as pd
 import patsy
 
-#cantype=("ACC","ESCA","LGG","PCPG","THCA","BLCA","GBM","LIHC","PRAD","THYM","BRCA","HNSC","LUAD","UCEC","CESC","KICH","LUSC","SARC","UCS","CHOL","KIRC","MESO","SKCM","UVM","COAD","KIRP","OV","STAD","DLBC","LAML","PAAD","TGCT")
-
+samplelist = str(sys.argv[1])
 glban=open("gdan_aim_patient_ancestry_calls.txt")
 
 eur_pop={}
