@@ -10,7 +10,7 @@ python find_local_ancestry_by_gene.py PIK3CA 3:178864311-178959881
 
 #### Genome-wide local ancestry enricment (generate zscores). 
 
-#### Step 1:
+#### Step 1: read in local ancestry breakpoints identified in the cohort.
 ```
 python local_ancestry_count_blocks.py samplelist.txt
 ```
