@@ -11,7 +11,7 @@ python find_local_ancestry_by_gene.py samplelist.txt PIK3CA 3:178864311-17895988
 
 ### Genome-wide local ancestry enricment. 
 
-#### Step 1: read in local ancestry breakpoints identified in the cohort.
+#### Step 1: read in local ancestry breakpoints identified in the cohort. Output: admixture_blocks.txt
 ```
 python local_ancestry_count_blocks.py samplelist.txt
 ```
@@ -22,8 +22,9 @@ TCGA-D8-A1JP_B.bed
 TCGA-E2-A1L9_A.bed
 TCGA-E2-A1L9_B.bed
 ```
-#### Step 2:  for each region with unique local ancestry across samples in the cohort identified from step 1, generate the zscore relative to the genome.
+#### Step 2: for each region with unique local ancestry across samples in the cohort identified from step 1, generate the zscore relative to the genome.
 ```
-python local_ancestry_enrichment.py
+python local_ancestry_enrichment.py admixture_blocks.txt
+```
 ```
 
