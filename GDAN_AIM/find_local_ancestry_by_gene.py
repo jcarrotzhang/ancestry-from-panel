@@ -17,30 +17,20 @@ import statsmodels.formula.api as sm
 import patsy
 import statsmodels
 
-cantype=["ACC","ESCA","LGG","PCPG","THCA","BLCA","GBM","LIHC","PRAD","THYM","BRCA","HNSC","LUAD","UCEC","CESC","KICH","LUSC","SARC","UCS","CHOL","KIRC","MESO","SKCM","UVM","COAD","KIRP","OV","STAD","DLBC","LAML","PAAD","TGCT"]
-loc = str(sys.argv[2])
-Gene = str(sys.argv[1])
+inputfile = str(sys.argv[1])
+loc = str(sys.argv[3])
+Gene = str(sys.argv[2])
+globan=open("gdan_aim_patient_ancestry_calls.txt")
+
 chrom, pos = loc.split(":")
 pos1, pos2 = pos.split("-")
 
 gl=[]
-
-input2=open("TCGA_geno/gdan_aim_patient_ancestry_calls.txt")
-input3=open("/xchip/gcc_data/results2/aggregate/sif/production.postprocess.sif.txt")
-
 eur_pop={}
 afr_pop={}
 
-arrayids={}
-for line in (raw.strip().split() for raw in input3):
-       m = re.search('GenomeWideSNP_6_(.+?)$', line[3])
-       if m:
-       	arrayid=m.group(1)
-	samplename=str(line[2])
-	arrayids[samplename]=arrayid
-
 ### find admixed information. ###
-for line in (raw.strip().split() for raw in input2):
+for line in (raw.strip().split() for raw in globan):
 	if "patient" not in line[0]:
 		if "NA" not in line[len(line)-4]:
 			if (float(line[len(line)-4]) > 0.1):
@@ -53,30 +43,27 @@ for line in (raw.strip().split() for raw in input2):
 
 bks=[pos1, pos2]
 
-for ctype in cantype:
-       samplelist=open("/cga/meyerson/home/zhangj/kgp/TCGA_geno/0205_seunghun/"+ctype+"/final/nofbk/samplelist")
-       files=[]
-       for line in (raw.strip().split() for raw in samplelist):
+
+samplelist=open(inputfile)
+files=[]
+for line in (raw.strip().split() for raw in samplelist):
                files.append(line[0])
-       for sample in eur_pop:
-               if sample in arrayids:
-			#print "working on", ctype, sample 
-			sn=arrayids[sample]
-			inputfile4 = "/cga/meyerson/home/zhangj/kgp/TCGA_geno/0205_seunghun/"+ctype+"/final/nofbk/"+sn+"_A.bed"
-			if inputfile4 in files:
-                               input4=open(inputfile4) 
-			       for line1 in (raw.strip().split() for raw in input4):
-			               if (str(line1[0]) == chrom) and ("UNK" not in line1[3]):
+for sample in eur_pop:
+		inputfile1 = sample+"_A.bed"
+		if inputfile1 in files:
+                               input1=open(inputfile1) 
+			       for line1 in (raw.strip().split() for raw in input1):
+			      	       if (str(line1[0]) == chrom) and ("UNK" not in line1[3]):
 					       if (int(line1[1]) < int(pos2)) and (int(line1[1]) > int(pos1)): 
 						       if str(line1[1]) not in bks:
 						    	   bks.append(str(line1[1]))
 					       if (int(line1[2]) < int(pos2)) and (int(line1[2]) > int(pos1)): 
 							if str(line1[2]) not in bks:
 								bks.append(str(line1[2]))
-			inputfile5 = "/cga/meyerson/home/zhangj/kgp/TCGA_geno/0205_seunghun/"+ctype+"/final/nofbk/"+sn+"_B.bed"
-			if inputfile5 in files:
-				input5=open(inputfile5)
-				for line1 in (raw.strip().split() for raw in input5):
+		inputfile2 = sample+"_B.bed"
+		if inputfile2 in files:
+				input2=open(inputfile2)
+				for line1 in (raw.strip().split() for raw in input2):
 					if (str(line1[0]) == chrom) and ("UNK" not in line1[3]):
 						if (int(line1[1]) < int(pos2)) and (int(line1[1]) > int(pos1)): 
 							if str(line1[1]) not in bks:
@@ -87,15 +74,15 @@ for ctype in cantype:
 
 mutation={}
 for ctype in cantype:
-	inputfile1 = "TCGA_geno/mc3"+"/MC3_"+ctype+"_sample_sig_gene_table.txt"
-	input1=open(inputfile1)
+	MC3 = "MC3_"+ctype+"_sample_sig_gene_table.txt"
+	mc3=open(MCS)
 	sample_pos={}
-	first = input1.readline().split('\t')
+	first = mc3.readline().split('\t')
 	for i in first:
 		sampleID = i[:12]
 		s= first.index(i)
 		sample_pos[s]=sampleID
-	for line in (raw.strip().split('\t') for raw in input1):
+	for line in (raw.strip().split('\t') for raw in mc3):
 		s = 1
 		gene=str(line[0])
 		if Gene in gene:
