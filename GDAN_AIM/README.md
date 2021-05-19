@@ -2,16 +2,27 @@
 
 ## Usage example
 
-#### local ancestry enrichment by gene. 
+#### Local ancestry enrichment by gene. 
 
 ```
-python TCGA_find_local_ancestry_by_gene.py PIK3CA 3:178864311-178959881
+python find_local_ancestry_by_gene.py PIK3CA 3:178864311-178959881
 ```
 
-#### genome-wide local ancestry enricment (generate zscores). 
+#### Genome-wide local ancestry enricment (generate zscores). 
 
+#### Step 1:
 ```
-python TCGA_geno_scripts/TCGA_find_local_ancestry_count_blocks.py
+python find_local_ancestry_count_blocks.py samplelist.txt
+```
+#####    Input: samplelist.txt   (prepare a list of local ancestry output file per sample in bed format.)
+```
+TCGA-35-A46O_A.bed
+TCGA-35-A46O_B.bed
+TCGA-36-A47O_A.bed
+TCGA-36-A47O_B.bed
+```
+#### Step 2:
+```
 python local_ancestry_enrichment.py
 ```
 
