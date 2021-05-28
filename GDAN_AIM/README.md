@@ -13,6 +13,18 @@ TCGA-D8-A1JP_A.bed
 TCGA-D8-A1JP_B.bed
 TCGA-E2-A1L9_A.bed
 TCGA-E2-A1L9_B.bed
+...
+```
+##### Output file: admixture_blocks.txt 
+```
+1:721290
+1:5879772
+1:5902050
+1:13354121
+1:13703662
+1:17554853
+1:17559676
+...
 ```
 ### Genome-wide local ancestry enricment. 
 
@@ -26,5 +38,3 @@ python local_ancestry_count_blocks.py samplelist.txt
 ```
 python local_ancestry_enrichment.py admixture_blocks.txt
 ```
-```
-
